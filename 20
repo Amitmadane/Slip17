@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_FRAMES 10
+#define MAX_PAGES 16
+int findOptimalPage(int pages[], int pageFrames[], int frameCount, int currentIndex, int totalPages) {
+    int optimalPage = -1;
+    int farthest = -1;
+    for (int i = 0; i < frameCount; i++) {
+        int j;
+        for (j = currentIndex + 1; j < totalPages; j++) {
+            if (pageFrames[i] == pages[j]) {
+                if (j > farthest) {
+                    farthest = j;
+                    optimalPage = i;
+                }
+                break;
+            }
+        }
+        if (j == totalPages) {
+            return i;
+        }
+    }
+    return (optimalPage != -1) ? optimalPage : 0;
+}
+int main() {
+    int frames; 
+    int pageReference[MAX_PAGES] = {12, 15, 12, 18, 6, 8, 11, 12, 19, 12, 6, 8, 12, 15, 19, 8};
+    int pageFaults = 0; 
+    int pageFrames[MAX_FRAMES]; 
+    printf("Enter the number of memory frames (n): ");
+    scanf("%d", &frames);
+    for (int i = 0; i < frames; i++) {
+        pageFrames[i] = -1;
+    }
+    printf("Reference String: ");
+    for (int i = 0; i < MAX_PAGES; i++) {
+        printf("%d ", pageReference[i]);
+    }
+    printf("\n");
+    for (int i = 0; i < MAX_PAGES; i++) {
+        int currentPage = pageReference[i];
+        int pageFound = 0;
+        for (int j = 0; j < frames; j++) {
+            if (pageFrames[j] == currentPage) {
+                pageFound = 1; 
+                break;
+            }
+        }
+        if (!pageFound) {
+            pageFaults++;
+            int replaceIndex = findOptimalPage(pageReference, pageFrames, frames, i, MAX_PAGES);
+            pageFrames[replaceIndex] = currentPage; 
+            printf("Page Fault! Current page frames: ");
+            for (int j = 0; j < frames; j++) {
+                printf("%d ", pageFrames[j]);
+            }
+            printf("\n");
+        } else {
+            printf("Page %d found in memory. No page fault.\n", currentPage);
+        }
+    }
+    printf("\nTotal number of page faults: %d\n", pageFaults);
+    return 0;
+}
